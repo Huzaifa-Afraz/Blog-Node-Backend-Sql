@@ -1,6 +1,15 @@
 import express from "express"
+import {db} from "./db.js"
 const app=express();
-app.user(express.json())
+app.use(express.json())
 app.listen(8800,()=>{
     console.log("Server is running on port 8800")
+    db.query('SELECT 1 + 1 AS solution', (err, results) => {
+        if (err) {
+            console.error('Error executing query:', err);
+            return;
+        }
+        console.log('Query result:', results[0].solution); 
+    });
 })
+ 
