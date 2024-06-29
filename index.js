@@ -1,7 +1,12 @@
 import express from "express"
 import {db} from "./db.js"
+import PostRouter from "./routes/posts.js"
+import UsersRouter from "./routes/users.js"
+import AuthRouter  from "./routes/auth.js"
+
 const app=express();
 app.use(express.json())
+
 app.listen(8800,()=>{
     console.log("Server is running on port 8800")
     db.query('SELECT 1 + 1 AS solution', (err, results) => {
@@ -13,3 +18,6 @@ app.listen(8800,()=>{
     });
 })
  
+app.use('/api/auth', AuthRouter)
+app.use('/api/users', UsersRouter)
+app.use('/api/posts', PostRouter)
