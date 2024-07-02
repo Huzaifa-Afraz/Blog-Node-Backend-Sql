@@ -3,8 +3,10 @@ import {db} from "./db.js"
 import PostRouter from "./routes/posts.js"
 import UsersRouter from "./routes/users.js"
 import AuthRouter  from "./routes/auth.js"
+import cors from "cors"
 
 const app=express();
+app.use(cors())
 app.use(express.json())
 
 app.listen(8800,()=>{
