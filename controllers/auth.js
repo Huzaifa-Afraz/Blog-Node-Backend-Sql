@@ -13,12 +13,19 @@ export const login=(req,res)=>{
 
 //register funciton logic
 export const register=(req,res)=>{
-    const sqlQ="select * from users where email=? or name=?";
-    db.query(sqlQ, [req.body.email, req.body.name],(err, data)=>{
-        if (err) return res.json(err)
-            if (data.length) return res.json({message: "User already exists!"})
+    try{
+        const { name, email, password } = req.body;
+
+        if (!name || !email || !password) {
+            return res.status(400).json("All fields are required" );
+        }
+//check if user already exists
+    const sqlQ="select * from users where email=?";
+    db.query(sqlQ, [email],(err, data)=>{
+        if (err) return res.status(404).json(err)
+            if (data.length) return res.status(409).json("User already exists!")
                 
-    })
+    
     //Hash the password and create the user
 const salt =bcrypt.genSaltSync(10);
 const Hash=bcrypt.hashSync(req.body.password, salt);
@@ -26,10 +33,17 @@ const q="INSERT INTO users (`name`, `email`, `password`) VALUES (?)";
 const VALUES=[req.body.name, req.body.email, Hash];
 db.query(q, [VALUES],(err, data)=>{
     if(err) return res.json(err)
-        return res.status(200).json( "User created!")});
+        return res.status(200).json("User created!")});
 
-
+})
 }
+catch(err){
+    console.error(err);
+        return res.status(500).json("An error occurred try again");
+    
+}
+}
+
 
 
 
