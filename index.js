@@ -4,10 +4,11 @@ import PostRouter from "./routes/posts.js"
 import UsersRouter from "./routes/users.js"
 import AuthRouter  from "./routes/auth.js"
 import cors from "cors"
-
+import cookieParser from "cookie-parser"
 const app=express();
 app.use(cors())
 app.use(express.json())
+app.use(cookieParser())
 
 app.listen(8800,()=>{
     console.log("Server is running on port 8800")

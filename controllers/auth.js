@@ -4,10 +4,31 @@
 
 import {db }from '../db.js'
 import bcrypt from "bcryptjs"
-
+import jwt from "jsonwebtoken"
 //login function logic
 export const login=(req,res)=>{
-    console.log("login controller")
+    try{
+        const query="SELECT * FROM users where email=?";
+        // const {name, email, password}=req.body;
+        db.query(query, [req.body.email], (err,data)=>{ 
+            if(err) return res.status(404).json(err);
+            if(data.length===0) return res.status(404).json("User not found");
+            const isMatch=bcrypt.compareSync(req.body.password,data[0].password);
+            if(!isMatch) return res.status(404).json("Invalid password");
+            const {password, ...other}=data[0];
+            
+            const token=jwt.sign({id:data[0].id},"jwt")
+
+                res.cookie("auth__token", token,{
+                    httpOnly:true,
+                }).status(200).json(other, token)
+                
+        })
+
+    }catch(err){
+        return res.status(500).json("An error occured Try again")
+    }
+
 }
 
 
@@ -34,7 +55,6 @@ const VALUES=[req.body.name, req.body.email, Hash];
 db.query(q, [VALUES],(err, data)=>{
     if(err) return res.json(err)
         return res.status(200).json("User created!")});
-
 })
 }
 catch(err){
