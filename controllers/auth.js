@@ -21,7 +21,7 @@ export const login=(req,res)=>{
 
                 res.cookie("auth__token", token,{
                     httpOnly:true,
-                }).status(200).json(other, token)
+                }).status(200).json(other)
                 
         })
 
