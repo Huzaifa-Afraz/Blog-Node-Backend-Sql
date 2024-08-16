@@ -69,4 +69,14 @@ catch(err){
 
 
 //logut function logic
-export const logout=(req,res)=>{}
+export const logout=(req,res)=>{
+    try {
+        res.clearCookie("auth__token",{
+            sameSite:"none",
+            secure:true
+        }).status(200).json("user has been logout")
+        
+    } catch (error) {
+        res.status(500).json(error)
+    }
+}
