@@ -7,7 +7,19 @@ export const getPosts=(req,res)=>{
             return res.status(200).json(data)
     })
 }
-export const getPost=(req,res)=>{}
-export const addPost=(req,res)=>{}
+export const getPost=(req,res)=>{
+    const query="SELECT name, title, `desc`,p.img, u.img AS userimg,date FROM blog.users u JOIN blog.posts p ON u.id=p.userid WHERE p.id=?";
+    console.log(req.params.id)
+    db.query(query, [req.params.id],(err, data)=>{
+        if(err)return res.status(500).json("Error to fetch post try to reload")
+            console.log(data[0])
+            return res.status(200).json(data[0])
+
+    })
+
+}
+export const addPost=(req,res)=>{
+    const {title,desc,cat}=req.body
+}
 export const updatePost=(req,res)=>{}
 export const deletePost=(req,res)=>{}
