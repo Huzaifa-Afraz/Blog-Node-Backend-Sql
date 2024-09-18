@@ -14,14 +14,27 @@ export const login=(req,res)=>{
             if(err) return res.status(404).json(err);
             if(data.length===0) return res.status(404).json("User not found");
             const isMatch=bcrypt.compareSync(req.body.password,data[0].password);
+            console.log(isMatch)
             if(!isMatch) return res.status(404).json("Invalid password");
+
             const {password, ...other}=data[0];
-            
+            console.log(password);
+            console.log(other)
             const token=jwt.sign({id:data[0].id},"jwt")
 
-                res.cookie("auth__token", token,{
+            console.log('setting cookie')
+               return res.cookie("auth__token", token,{
+                    
                     httpOnly:true,
+                    maxAge: 24*60*60*1000,
                 }).status(200).json(other)
+                // console.log(res.cookie("auth__token", token,{
+                    
+                //     httpOnly:true,
+                //     maxAge: 24*60*60*1000,
+                // }).status(200).json(other))
+
+                // console.log('cookie set')
                 
         })
 
@@ -58,7 +71,7 @@ db.query(q, [VALUES],(err, data)=>{
 })
 }
 catch(err){
-    console.error(err);
+    // console.error(err);
         return res.status(500).json("An error occurred try again");
     
 }
