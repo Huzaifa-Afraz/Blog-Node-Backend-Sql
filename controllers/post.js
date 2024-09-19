@@ -13,7 +13,7 @@ export const getPost=(req,res)=>{
     // console.log(req.params.id)
     db.query(query, [req.params.id],(err, data)=>{
         if(err)return res.status(500).json("Error to fetch post try to reload")
-            console.log(data[0])
+            // console.log(data[0])
             return res.status(200).json(data[0])
 
     })
@@ -22,8 +22,26 @@ export const getPost=(req,res)=>{
 export const addPost=(req,res)=>{
     const {title,desc,cat}=req.body
     const token=req.cookie.auth__token;
+    console.log(token)
     if(!token) return res.status(401).json("you are unauthorized")
-        jwt.verify(token, "jwt",(err, userid)=>{})
+        jwt.verify(token, "jwt",(err, userid)=>{
+    const q="INSERT INTO posts(`title`,`desc`, `img`,`cat`,`date`, `userid`) VALUES(?)"
+    const values=[
+        req.body.title,
+        req.body.desc,
+        req.body.img,
+        req.body.cat,
+        req.body.date,
+        userid
+    ];
+    console.log({values})
+    db.query(q,values,(err, data)=>{
+        if(err)return res.status(500).json("Error to add post")
+
+            return res.json("post added successfully");
+    })
+
+        })
 
 
 
