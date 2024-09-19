@@ -20,22 +20,25 @@ export const getPost=(req,res)=>{
 
 }
 export const addPost=(req,res)=>{
-    const {title,desc,cat}=req.body
-    const token=req.cookie.auth__token;
+    // const {title,desc,cat}=req.body
+    console.log(req.body)
+    console.log("add post function call")
+    const token=req.cookies.auth__token;
     console.log(token)
     if(!token) return res.status(401).json("you are unauthorized")
-        jwt.verify(token, "jwt",(err, userid)=>{
+        jwt.verify(token, "jwt",(err, userInfo)=>{
+    console.log(userInfo.id)
     const q="INSERT INTO posts(`title`,`desc`, `img`,`cat`,`date`, `userid`) VALUES(?)"
     const values=[
         req.body.title,
         req.body.desc,
-        req.body.img,
+        req.body.img.filename,
         req.body.cat,
         req.body.date,
-        userid
+        userInfo.id
     ];
     console.log({values})
-    db.query(q,values,(err, data)=>{
+    db.query(q,[values],(err, data)=>{
         if(err)return res.status(500).json("Error to add post")
 
             return res.json("post added successfully");
@@ -46,7 +49,34 @@ export const addPost=(req,res)=>{
 
 
 }
-export const updatePost=(req,res)=>{}
+export const updatePost=(req,res)=>{
+    console.log(req.body)
+    console.log("updated post function call")
+    const token=req.cookies.auth__token;
+    console.log(token)
+    if(!token) return res.status(401).json("you are unauthorized")
+        jwt.verify(token, "jwt",(err, userInfo)=>{
+    console.log(userInfo)
+    const postid=req.params.id;
+    console.log(postid)
+    const q="UPDATE posts SET `title`=?, `desc`=?, `img`=?, `cat`=? WHERE  `id`=? AND `userid`=?"
+    const values=[
+        req.body.title,
+        req.body.desc,
+        req.body.img.filename,
+        req.body.cat,
+        postid,
+        userInfo.id
+    ];
+    console.log({...values})
+    db.query(q,values,(err, data)=>{
+        if(err)return res.status(500).json("Error to update post")
+
+            return res.json("post updated successfully");
+    })
+
+        })
+}
 
 
 
