@@ -8,7 +8,10 @@ import multer from "multer"
 import cors from "cors"
 import cookieParser from "cookie-parser"
 const app=express();
-app.use(cors())
+app.use(cors({
+  origin: 'http://localhost:3000', 
+  credentials: true,
+}))
 app.use(cookieParser())
 app.use(express.json())
 
@@ -31,7 +34,7 @@ const storage = multer.diskStorage({
     res.status(200).json({ filename: file.filename });
   });
 
-  
+
 app.listen(8800)
  
 app.use('/api/auth', AuthRouter)

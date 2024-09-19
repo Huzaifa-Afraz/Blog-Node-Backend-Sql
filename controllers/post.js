@@ -52,7 +52,7 @@ export const updatePost=(req,res)=>{}
 
 
 export const deletePost=(req,res)=>{
-    const token=req.cookie.auth__token;
+    const token=req.cookies.auth__token;
     if(!token) return res.status(401).json("you are unauthorized")
         jwt.verify(token, "jwt",(err, userid)=>{
     if(err) return res.status(403).json('tocken is not valid')
