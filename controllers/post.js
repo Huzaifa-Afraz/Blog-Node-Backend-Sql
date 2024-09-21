@@ -19,64 +19,80 @@ export const getPost=(req,res)=>{
     })
 
 }
-export const addPost=(req,res)=>{
-    // const {title,desc,cat}=req.body
-    console.log(req.body)
-    console.log("add post function call")
-    const token=req.cookies.auth__token;
-    console.log(token)
-    if(!token) return res.status(401).json("you are unauthorized")
-        jwt.verify(token, "jwt",(err, userInfo)=>{
-    console.log(userInfo.id)
-    const q="INSERT INTO posts(`title`,`desc`, `img`,`cat`,`date`, `userid`) VALUES(?)"
-    const values=[
+export const addPost = (req, res) => {
+    const token = req.cookies.auth__token;
+  
+    if (!token) return res.status(401).json("You are unauthorized");
+  
+    jwt.verify(token, "jwt", (err, userInfo) => {
+      if (err) return res.status(403).json("Token is invalid");
+  
+      // Check if the image is provided
+      if (!req.body.img || !req.body.img.filename) {
+        return res.status(400).json("Image cannot be null");
+      }
+  
+      const q = "INSERT INTO posts(`title`, `desc`, `img`, `cat`, `date`, `userid`) VALUES(?)";
+      const values = [
         req.body.title,
         req.body.desc,
-        req.body.img.filename,
+        req.body.img.filename, // Ensure that the image filename is not null
         req.body.cat,
         req.body.date,
-        userInfo.id
-    ];
-    console.log({values})
-    db.query(q,[values],(err, data)=>{
-        if(err)return res.status(500).json("Error to add post")
-
-            return res.json("post added successfully");
-    })
-
-        })
-
-
-
-}
-export const updatePost=(req,res)=>{
-    console.log(req.body)
-    console.log("updated post function call")
-    const token=req.cookies.auth__token;
-    console.log(token)
-    if(!token) return res.status(401).json("you are unauthorized")
-        jwt.verify(token, "jwt",(err, userInfo)=>{
-    console.log(userInfo)
-    const postid=req.params.id;
-    console.log(postid)
-    const q="UPDATE posts SET `title`=?, `desc`=?, `img`=?, `cat`=? WHERE  `id`=? AND `userid`=?"
-    const values=[
-        req.body.title,
-        req.body.desc,
-        req.body.img.filename,
-        req.body.cat,
-        postid,
-        userInfo.id
-    ];
-    console.log({...values})
-    db.query(q,values,(err, data)=>{
-        if(err)return res.status(500).json("Error to update post")
-
-            return res.json("post updated successfully");
-    })
-
-        })
-}
+        userInfo.id,
+      ];
+  
+      db.query(q, [values], (err, data) => {
+        if (err) return res.status(500).json("Error adding post");
+  
+        return res.json("Post added successfully");
+      });
+    });
+  };
+  
+export const updatePost = (req, res) => {
+    try {
+      const token = req.cookies.auth__token;
+      if (!token) return res.status(401).json("You are unauthorized");
+  
+      jwt.verify(token, "jwt", (err, userInfo) => {
+        if (err) return res.status(403).json("Token is invalid");
+  
+        const postid = req.params.id;
+        const imgUrl = req.body.img?.filename || null;
+  
+        // First, retrieve the current image if a new one is not provided
+        const selectQuery = "SELECT img FROM posts WHERE id = ? AND userid = ?";
+        db.query(selectQuery, [postid, userInfo.id], (err, result) => {
+          if (err) return res.status(500).json("Error retrieving current image");
+          
+          // Use the existing image if no new one is provided
+          const currentImg = result[0]?.img || null;
+          const updatedImg = imgUrl || currentImg;
+  
+          const q = "UPDATE posts SET `title`=?, `desc`=?, `img`=?, `cat`=? WHERE `id`=? AND `userid`=?";
+          const values = [
+            req.body.title,
+            req.body.desc,
+            updatedImg, // Update image with either new or existing one
+            req.body.cat,
+            postid,
+            userInfo.id,
+          ];
+  
+          db.query(q, values, (err, data) => {
+            if (err) return res.status(500).json("Error updating post");
+  
+            return res.status(200).json("Post updated successfully");
+          });
+        });
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json("Server error");
+    }
+  };
+  
 
 
 
