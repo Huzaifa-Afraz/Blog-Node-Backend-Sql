@@ -10,10 +10,8 @@ export const getPosts=(req,res)=>{
 }
 export const getPost=(req,res)=>{
     const query="SELECT name, title, `desc`,p.img, p.cat, p.id AS postid, u.img AS userimg,date FROM blog.users u JOIN blog.posts p ON u.id=p.userid WHERE p.id=?";
-    // console.log(req.params.id)
     db.query(query, [req.params.id],(err, data)=>{
         if(err)return res.status(500).json("Error to fetch post try to reload")
-            // console.log(data[0])
             return res.status(200).json(data[0])
 
     })
@@ -45,7 +43,7 @@ export const addPost = (req, res) => {
       db.query(q, [values], (err, data) => {
         if (err) return res.status(500).json("Error adding post");
   
-        return res.json("Post added successfully");
+        return res.status(200).json("Post added successfully");
       });
     });
   };
@@ -88,7 +86,6 @@ export const updatePost = (req, res) => {
         });
       });
     } catch (error) {
-      console.log(error);
       return res.status(500).json("Server error");
     }
   };
@@ -103,7 +100,6 @@ export const deletePost=(req,res)=>{
     if(!token) return res.status(401).json("you are unauthorized")
         jwt.verify(token, "jwt",(err, userinfo)=>{
     if(err) return res.status(403).json('tocken is not valid')
-      // console.log("params id= "+ req.params.id + " " +"user id= "+ userid.id)
         const query="DELETE FROM posts WHERE id=? AND userid=?";
     db.query(query,[req.params.id,userinfo.id],(err, data)=>{
         if(err)return res.status(500).json("Error to delete post")
@@ -111,8 +107,4 @@ export const deletePost=(req,res)=>{
     })
 
     })
-    // db.query(query,[req.params.id],(err,data)=>{
-    //     if(err)return res.status(500).json("Error to delete post")
-    //         return res.status(200).json("Post deleted")
-    //     })
 }
