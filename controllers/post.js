@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken"
 import {db} from "../db.js"
 export const getPosts=(req,res)=>{
-    const query=req.query.cat ? "select * from posts where cat=?":"select * from posts";
+    const query=req.query.cat ? "select * from posts where cat=?":"select * from posts ORDER BY date DESC";
 
     db.query(query, [req.query.cat],(err, data)=>{
         if(err)res.status(500).json("Error to fetch posts")
@@ -29,7 +29,7 @@ export const addPost = (req, res) => {
   
       // Check if the image is provided
       if (!req.body.img || !req.body.img.filename) {
-        return res.status(400).json("Image cannot be null");
+        return res.status(400).json("please upload image");
       }
   
       const q = "INSERT INTO posts(`title`, `desc`, `img`, `cat`, `date`, `userid`) VALUES(?)";
@@ -98,19 +98,21 @@ export const updatePost = (req, res) => {
 
 
 export const deletePost=(req,res)=>{
-    const token=req.cookies.auth__token;
+    // const token=req.cookies.auth__token;
+    const token = req.cookies.auth__token;
     if(!token) return res.status(401).json("you are unauthorized")
-        jwt.verify(token, "jwt",(err, userid)=>{
+        jwt.verify(token, "jwt",(err, userinfo)=>{
     if(err) return res.status(403).json('tocken is not valid')
+      // console.log("params id= "+ req.params.id + " " +"user id= "+ userid.id)
         const query="DELETE FROM posts WHERE id=? AND userid=?";
-    db.query(query,[req.params.id,userid],(err, data)=>{
+    db.query(query,[req.params.id,userinfo.id],(err, data)=>{
         if(err)return res.status(500).json("Error to delete post")
             return res.status(200).json("post deleted")
     })
 
     })
-    db.query(query,[req.params.id],(err,data)=>{
-        if(err)return res.status(500).json("Error to delete post")
-            return res.status(200).json("Post deleted")
-        })
+    // db.query(query,[req.params.id],(err,data)=>{
+    //     if(err)return res.status(500).json("Error to delete post")
+    //         return res.status(200).json("Post deleted")
+    //     })
 }
