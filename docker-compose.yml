@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: Huzaifa123
+      MYSQL_DATABASE: blog
+    ports:
+      - '3306:3306'
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: Huzaifa123
+      MYSQL_DATABASE: blog
+    ports:
+      - '8800:8800'
+    depends_on:
+      - mysql
+
+volumes:
+  mysql-data:
