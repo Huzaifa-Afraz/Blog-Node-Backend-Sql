@@ -7,14 +7,15 @@ import Upload from "./routes/upload.js"
 import multer from "multer"
 import cors from "cors"
 import cookieParser from "cookie-parser"
+import dotenv from "dotenv"
 const app=express();
 app.use(cors({
-  origin: 'http://localhost:3000', 
   credentials: true,
 }))
+dotenv.config();
 app.use(cookieParser())
 app.use(express.json())
-
+// app.use(dotenv());
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
       cb(null, '../front-end/public/upload')
